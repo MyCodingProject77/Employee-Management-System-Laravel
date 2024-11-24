@@ -1,0 +1,120 @@
+
+
+      .env file
+
+
+       DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=employeedb
+DB_USERNAME=root
+DB_PASSWORD=Vxymai54786666@
+
+
+
+
+     Migrations create table
+
+      Schema::create('employees', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('position');
+            $table->string('email');
+            $table->date('dob');
+            $table->decimal('salary', 8, 2);
+            $table->timestamps();
+        });
+
+
+
+
+      EmployeeController
+
+
+      public function index()
+    {
+        $employees = Employee::all();
+        return view('employees.index', compact('employees'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('employees.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+            'position' => 'required',
+            'dob' => 'required|date',
+            'salary' => 'required|numeric',
+        ]);
+
+        Employee::create($request->all());
+        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Employee $employee)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Employee $employee)
+    {
+        return view('employees.edit', compact('employee'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Employee $employee)
+    {
+        $employee->update($request->only(['name', 'email', 'position', 'dob', 'salary']));
+        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Employee $employee)
+    {
+        $employee->delete();
+        return redirect()->route('employees.index')->with('success', 'Employee deleted successfully!');
+    }
+
+
+
+    
+
+     Define the routes in web.php
+
+
+      // Default route that redirects to /employees
+Route::get('/', [EmployeeController::class, 'index'])->name('home');
+
+// Employees index route
+Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+
+// Other routes for employees
+Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+
+
+
